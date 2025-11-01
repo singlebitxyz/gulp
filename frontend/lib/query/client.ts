@@ -34,5 +34,10 @@ export const queryKeys = {
     profile: (userId: string) => ["user", "profile", userId] as const,
     preferences: (userId: string) => ["user", "preferences", userId] as const,
   },
+  bots: {
+    all: ["bots"] as const,
+    list: () => ["bots", "list"] as const,
+    detail: (botId: string) => ["bots", "detail", botId] as const,
+  },
   // Add more query keys as needed
 } as const;
