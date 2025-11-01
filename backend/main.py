@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 import logging
 from controller.user import router as user_router
 from controller.bot import router as bot_router
+from controller.widget_token import widget_token_router
 from config.settings import settings
 from core.exceptions import BaseAPIException
 from core.logging import setup_logging
@@ -39,6 +40,7 @@ async def rate_limit(request: Request, call_next):
 # Include routers
 app.include_router(user_router, prefix="/api/v1", tags=["user"])
 app.include_router(bot_router, prefix="/api/v1", tags=["bot"])
+app.include_router(widget_token_router, prefix="/api/v1", tags=["widget-token"])
 
 
 @app.exception_handler(BaseAPIException)

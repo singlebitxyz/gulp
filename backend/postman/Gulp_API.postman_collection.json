@@ -1,242 +1,344 @@
 {
-	"info": {
-		"_postman_id": "gulp-api-collection",
-		"name": "Gulp API",
-		"description": "Complete API collection for Gulp chatbot platform with bot management, authentication, and RAG features.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "gulp-api"
-	},
-	"item": [
-		{
-			"name": "Health & Status",
-			"item": [
-				{
-					"name": "Health Check",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/health",
-							"host": ["{{base_url}}"],
-							"path": ["health"]
-						},
-						"description": "Check if the API is running and healthy"
-					},
-					"response": []
-				},
-				{
-					"name": "Root Endpoint",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/",
-							"host": ["{{base_url}}"],
-							"path": [""]
-						},
-						"description": "Get API information and version"
-					},
-					"response": []
-				}
-			],
-			"description": "Health check and status endpoints"
-		},
-		{
-			"name": "Authentication",
-			"item": [
-				{
-					"name": "Check User",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/check-user",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "check-user"]
-						},
-						"description": "Check if user is authenticated via Supabase cookie.\n\n**Authentication:** Required (via cookie)\n**Features:**\n- Validates authentication token from cookie\n- Returns user information if authenticated\n- Returns 401 if not authenticated"
-					},
-					"response": []
-				}
-			],
-			"description": "User authentication endpoints"
-		},
-		{
-			"name": "Bot Management",
-			"item": [
-				{
-					"name": "Create Bot",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    var jsonData = pm.response.json();",
-									"    if (jsonData.data && jsonData.data.id) {",
-									"        pm.environment.set('bot_id', jsonData.data.id);",
-									"        console.log('Bot ID saved:', jsonData.data.id);",
-									"    }",
-									"}"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"My Customer Support Bot\",\n    \"description\": \"A helpful bot for answering customer questions\",\n    \"system_prompt\": \"You are a friendly customer support assistant. Answer questions clearly and professionally.\",\n    \"llm_provider\": \"openai\",\n    \"llm_config\": {\n        \"temperature\": 0.7,\n        \"max_tokens\": 1000,\n        \"model_name\": \"gpt-4o\"\n    },\n    \"retention_days\": 90\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/bots",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "bots"]
-						},
-						"description": "Create a new bot.\n\n**Authentication:** Required\n**Request Body:**\n- `name` (required): Bot name (1-100 characters)\n- `description` (optional): Bot description (max 500 characters)\n- `system_prompt` (optional): Custom system prompt\n- `llm_provider` (optional): 'openai' or 'gemini' (default: 'openai')\n- `llm_config` (optional): LLM configuration\n  - `temperature`: 0.0-2.0 (default: 0.7)\n  - `max_tokens`: 1-4000 (default: 1000)\n  - `model_name`: Model name (default: 'gpt-4o')\n- `retention_days` (optional): Query log retention (1-3650 days, default: 90)\n\n**Response:**\n- Returns created bot with ID\n- Automatically saves bot_id to environment variable"
-					},
-					"response": []
-				},
-				{
-					"name": "List Bots",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/bots",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "bots"]
-						},
-						"description": "List all bots created by the authenticated user.\n\n**Authentication:** Required\n**Features:**\n- Returns all bots owned by the user\n- Ordered by creation date (newest first)\n- Returns empty array if no bots exist"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Bot by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "bots", "{{bot_id}}"]
-						},
-						"description": "Get a specific bot by ID.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Response:**\n- Returns bot details if found and authorized\n- Returns 404 if bot not found\n- Returns 403 if user doesn't own the bot"
-					},
-					"response": []
-				},
-				{
-					"name": "Update Bot",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Bot Name\",\n    \"description\": \"Updated description\",\n    \"llm_config\": {\n        \"temperature\": 0.8,\n        \"max_tokens\": 1500\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "bots", "{{bot_id}}"]
-						},
-						"description": "Update a bot (partial update supported).\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Request Body (all fields optional):**\n- `name`: Bot name (1-100 characters)\n- `description`: Bot description (max 500 characters)\n- `system_prompt`: Custom system prompt\n- `llm_provider`: 'openai' or 'gemini'\n- `llm_config`: LLM configuration (partial updates merge with existing)\n- `retention_days`: Query log retention (1-3650 days)\n\n**Response:**\n- Returns updated bot\n- Only provided fields are updated"
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Bot",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}",
-							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "bots", "{{bot_id}}"]
-						},
-						"description": "Delete a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Warning:** This action cannot be undone. All associated data (sources, chunks, queries) will be deleted.\n\n**Response:**\n- Returns success message\n- Returns 404 if bot not found\n- Returns 403 if user doesn't own the bot"
-					},
-					"response": []
-				}
-			],
-			"description": "Bot management endpoints for creating, reading, updating, and deleting chatbots"
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					"// Set default headers for all requests",
-					"pm.request.headers.add({",
-					"    key: 'User-Agent',",
-					"    value: 'Gulp-API-Client/1.0'",
-					"});",
-					"",
-					"// Log request details",
-					"console.log('Request:', pm.request.method, pm.request.url);"
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					"// Common test script for all requests",
-					"pm.test('Status code is valid', function () {",
-					"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 401, 403, 404, 422, 429, 500]);",
-					"});",
-					"",
-					"pm.test('Response has valid JSON', function () {",
-					"    pm.response.to.have.jsonBody();",
-					"});",
-					"",
-					"pm.test('Response time is acceptable', function () {",
-					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-					"});",
-					"",
-					"// Check for rate limiting",
-					"if (pm.response.code === 429) {",
-					"    pm.test('Rate limit exceeded', function () {",
-					"        pm.expect(pm.response.json()).to.have.property('detail');",
-					"    });",
-					"}",
-					"",
-					"// Log response details",
-					"console.log('Response:', pm.response.code, pm.response.status);"
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:8000",
-			"type": "string"
-		}
-	]
+    "info": {
+        "_postman_id": "gulp-api-collection",
+        "name": "Gulp API",
+        "description": "Complete API collection for Gulp chatbot platform with bot management, authentication, and RAG features.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "gulp-api"
+    },
+    "item": [
+        {
+            "name": "Health & Status",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": ["{{base_url}}"],
+                            "path": ["health"]
+                        },
+                        "description": "Check if the API is running and healthy"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Root Endpoint",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/",
+                            "host": ["{{base_url}}"],
+                            "path": [""]
+                        },
+                        "description": "Get API information and version"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Health check and status endpoints"
+        },
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Check User",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/check-user",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "check-user"]
+                        },
+                        "description": "Check if user is authenticated via Supabase cookie.\n\n**Authentication:** Required (via cookie)\n**Features:**\n- Validates authentication token from cookie\n- Returns user information if authenticated\n- Returns 401 if not authenticated"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "User authentication endpoints"
+        },
+        {
+            "name": "Bot Management",
+            "item": [
+                {
+                    "name": "Create Bot",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.id) {",
+                                    "        pm.environment.set('bot_id', jsonData.data.id);",
+                                    "        console.log('Bot ID saved:', jsonData.data.id);",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"My Customer Support Bot\",\n    \"description\": \"A helpful bot for answering customer questions\",\n    \"system_prompt\": \"You are a friendly customer support assistant. Answer questions clearly and professionally.\",\n    \"llm_provider\": \"openai\",\n    \"llm_config\": {\n        \"temperature\": 0.7,\n        \"max_tokens\": 1000,\n        \"model_name\": \"gpt-4o\"\n    },\n    \"retention_days\": 90\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "bots"]
+                        },
+                        "description": "Create a new bot.\n\n**Authentication:** Required\n**Request Body:**\n- `name` (required): Bot name (1-100 characters)\n- `description` (optional): Bot description (max 500 characters)\n- `system_prompt` (optional): Custom system prompt\n- `llm_provider` (optional): 'openai' or 'gemini' (default: 'openai')\n- `llm_config` (optional): LLM configuration\n  - `temperature`: 0.0-2.0 (default: 0.7)\n  - `max_tokens`: 1-4000 (default: 1000)\n  - `model_name`: Model name (default: 'gpt-4o')\n- `retention_days` (optional): Query log retention (1-3650 days, default: 90)\n\n**Response:**\n- Returns created bot with ID\n- Automatically saves bot_id to environment variable"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "List Bots",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "bots"]
+                        },
+                        "description": "List all bots created by the authenticated user.\n\n**Authentication:** Required\n**Features:**\n- Returns all bots owned by the user\n- Ordered by creation date (newest first)\n- Returns empty array if no bots exist"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Bot by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots/{{bot_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "bots", "{{bot_id}}"]
+                        },
+                        "description": "Get a specific bot by ID.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Response:**\n- Returns bot details if found and authorized\n- Returns 404 if bot not found\n- Returns 403 if user doesn't own the bot"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Bot",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Updated Bot Name\",\n    \"description\": \"Updated description\",\n    \"llm_config\": {\n        \"temperature\": 0.8,\n        \"max_tokens\": 1500\n    }\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots/{{bot_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "bots", "{{bot_id}}"]
+                        },
+                        "description": "Update a bot (partial update supported).\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Request Body (all fields optional):**\n- `name`: Bot name (1-100 characters)\n- `description`: Bot description (max 500 characters)\n- `system_prompt`: Custom system prompt\n- `llm_provider`: 'openai' or 'gemini'\n- `llm_config`: LLM configuration (partial updates merge with existing)\n- `retention_days`: Query log retention (1-3650 days)\n\n**Response:**\n- Returns updated bot\n- Only provided fields are updated"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Bot",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots/{{bot_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "bots", "{{bot_id}}"]
+                        },
+                        "description": "Delete a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Warning:** This action cannot be undone. All associated data (sources, chunks, queries) will be deleted.\n\n**Response:**\n- Returns success message\n- Returns 404 if bot not found\n- Returns 403 if user doesn't own the bot"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Bot management endpoints for creating, reading, updating, and deleting chatbots"
+        },
+        {
+            "name": "Widget Token Management",
+            "item": [
+                {
+                    "name": "Create Widget Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.id) {",
+                                    "        pm.environment.set('widget_token_id', jsonData.data.id);",
+                                    "        console.log('Widget Token ID saved:', jsonData.data.id);",
+                                    "    }",
+                                    "    if (jsonData.token) {",
+                                    "        pm.environment.set('widget_token', jsonData.token);",
+                                    "        console.log('Widget Token saved (prefix):', jsonData.data.token_prefix);",
+                                    "        console.log('⚠️ IMPORTANT: Save the full token from response - it won't be shown again!');",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Production Website Token\",\n    \"allowed_domains\": [\n        \"https://example.com\",\n        \"https://www.example.com\"\n    ],\n    \"expires_at\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots/{{bot_id}}/widget-tokens",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "api",
+                                "v1",
+                                "bots",
+                                "{{bot_id}}",
+                                "widget-tokens"
+                            ]
+                        },
+                        "description": "Create a new widget token for a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Request Body:**\n- `name` (optional): Descriptive name for the token\n- `allowed_domains` (required): Array of allowed domains/origins\n  - Must include at least one domain\n  - Accepts full URLs (https://example.com) or domain names (example.com)\n  - Supports localhost for development\n- `expires_at` (optional): ISO 8601 timestamp for token expiration\n\n**Response:**\n- Returns token data with plain token (shown only once)\n- **IMPORTANT:** Save the token immediately - it won't be returned again\n- Token is hashed before storage (SHA-256)\n- Token prefix (first 8 chars) is shown for identification"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "List Widget Tokens",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots/{{bot_id}}/widget-tokens",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "api",
+                                "v1",
+                                "bots",
+                                "{{bot_id}}",
+                                "widget-tokens"
+                            ]
+                        },
+                        "description": "List all widget tokens for a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Response:**\n- Returns list of tokens (without plain tokens)\n- Includes token prefix for identification\n- Shows expiration status and last used timestamp\n- Ordered by creation date (newest first)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Revoke Widget Token",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/bots/{{bot_id}}/widget-tokens/{{widget_token_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": [
+                                "api",
+                                "v1",
+                                "bots",
+                                "{{bot_id}}",
+                                "widget-tokens",
+                                "{{widget_token_id}}"
+                            ]
+                        },
+                        "description": "Revoke (delete) a widget token.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n- `token_id`: Widget token UUID\n\n**Warning:** This action cannot be undone. The token will immediately stop working for all widget instances.\n\n**Response:**\n- Returns success message\n- Returns 404 if token not found\n- Returns 403 if user doesn't own the bot"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Widget token management endpoints for generating and managing tokens for embedding bots on websites"
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Set default headers for all requests",
+                    "pm.request.headers.add({",
+                    "    key: 'User-Agent',",
+                    "    value: 'Gulp-API-Client/1.0'",
+                    "});",
+                    "",
+                    "// Log request details",
+                    "console.log('Request:', pm.request.method, pm.request.url);"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Common test script for all requests",
+                    "pm.test('Status code is valid', function () {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 401, 403, 404, 422, 429, 500]);",
+                    "});",
+                    "",
+                    "pm.test('Response has valid JSON', function () {",
+                    "    pm.response.to.have.jsonBody();",
+                    "});",
+                    "",
+                    "pm.test('Response time is acceptable', function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+                    "});",
+                    "",
+                    "// Check for rate limiting",
+                    "if (pm.response.code === 429) {",
+                    "    pm.test('Rate limit exceeded', function () {",
+                    "        pm.expect(pm.response.json()).to.have.property('detail');",
+                    "    });",
+                    "}",
+                    "",
+                    "// Log response details",
+                    "console.log('Response:', pm.response.code, pm.response.status);"
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        }
+    ]
 }
-

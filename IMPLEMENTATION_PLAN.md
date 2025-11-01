@@ -18,7 +18,7 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 **Goal**: Users can create, view, edit, and delete bots.
 
-**Status**: ✅ **Backend Complete** | ⏳ Frontend Pending
+**Status**: ✅ **COMPLETE** (Backend ✅ | Frontend ✅)
 
 #### Backend (FastAPI) ✅
 
@@ -35,16 +35,18 @@ We'll implement one feature group at a time, building backend APIs first, then t
 -   [x] Secure client configuration (anon key + JWT token for RLS)
 -   [ ] Unit tests for bot operations
 
-#### Frontend (Next.js)
+#### Frontend (Next.js) ✅
 
--   [ ] Bot types/interfaces (TypeScript)
--   [ ] React Query hooks for bot APIs
--   [ ] Bot list page (`/dashboard/bots`)
--   [ ] Create bot form/modal
--   [ ] Edit bot form/modal
--   [ ] Bot card component
--   [ ] Delete bot confirmation dialog
--   [ ] Bot settings page (`/dashboard/bots/:id/settings`)
+-   [x] Bot types/interfaces (TypeScript)
+-   [x] React Query hooks for bot APIs
+-   [x] Bot list page (`/dashboard/bots`)
+-   [x] Create bot form/modal
+-   [x] Edit bot form/modal (via settings page)
+-   [x] Bot card component
+-   [x] Delete bot confirmation dialog
+-   [x] Bot settings page (`/dashboard/bots/:id/settings`)
+-   [x] Test chat interface (placeholder for Phase 8)
+-   [x] Train mode placeholder (for Phase 11)
 
 **Dependencies**: Database schema (✅ Complete)
 
@@ -63,8 +65,10 @@ We'll implement one feature group at a time, building backend APIs first, then t
 -   ✅ Backend: Users can select LLM provider (OpenAI/Gemini)
 -   ✅ Backend: Users can configure LLM settings (temperature, max tokens)
 -   ✅ Backend: RLS policies ensure users only see their own bots
--   ⏳ Frontend: Users can view all their bots in a card grid
--   ⏳ Frontend: Users can edit and delete their bots via UI
+-   ✅ Frontend: Users can view all their bots in a card grid
+-   ✅ Frontend: Users can edit and delete their bots via UI
+-   ✅ Frontend: Users can create new bots via modal dialog
+-   ✅ Frontend: Users can access bot settings page with tabs (Settings, Test, Train)
 
 ---
 
@@ -72,17 +76,22 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 **Goal**: Users can generate and manage widget tokens for embedding bots on websites.
 
-#### Backend (FastAPI)
+**Status**: ✅ **Backend Complete** | ⏳ Frontend Pending
 
--   [ ] Pydantic models for WidgetToken
--   [ ] Token generation (secure random + hashing)
--   [ ] Token validation middleware
--   [ ] Widget token endpoints:
+#### Backend (FastAPI) ✅
+
+-   [x] Pydantic models for WidgetToken
+-   [x] Token generation (secure random + hashing)
+-   [x] Token validation middleware
+-   [x] Widget token endpoints:
     -   `POST /api/v1/bots/:id/widget-tokens` - Generate token
     -   `GET /api/v1/bots/:id/widget-tokens` - List tokens
     -   `DELETE /api/v1/bots/:id/widget-tokens/:token_id` - Revoke token
--   [ ] Domain validation logic
--   [ ] Token expiration handling
+-   [x] Domain validation logic
+-   [x] Token expiration handling
+-   [x] Secure token storage (SHA-256 hashing, never store plain tokens)
+-   [x] RLS policies for token access
+-   [x] Service role support for public widget validation
 
 #### Frontend (Next.js)
 
@@ -95,16 +104,32 @@ We'll implement one feature group at a time, building backend APIs first, then t
 -   [ ] Revoke token button
 -   [ ] Widget setup page (`/dashboard/bots/:id/widget`)
 
-**Dependencies**: Phase 1 (Bot Management)
+**Dependencies**: Phase 1 (Bot Management) ✅
+
+**Backend Completion Notes** (✅ Done):
+
+-   All CRUD endpoints implemented and tested
+-   Secure token generation using `secrets.token_urlsafe()` (64 bytes)
+-   SHA-256 hashing before storage (never plain tokens in database)
+-   Token shown only once during creation
+-   Domain whitelist validation with flexible format support
+-   Expiration date validation and timezone handling
+-   RLS policies properly enforced using user JWT tokens
+-   Service role used for public widget token validation
+-   Authorization checks ensure users can only manage their own bot tokens
+-   Postman collection updated for testing
 
 **Acceptance Criteria**:
 
--   Users can generate widget tokens for their bots
--   Tokens can have multiple allowed domains
--   Tokens can have optional expiration dates
--   Users can view all tokens for a bot
--   Users can revoke tokens
--   Token hash is stored securely (never plain text)
+-   ✅ Backend: Users can generate widget tokens for their bots
+-   ✅ Backend: Tokens can have multiple allowed domains
+-   ✅ Backend: Tokens can have optional expiration dates
+-   ✅ Backend: Users can view all tokens for a bot
+-   ✅ Backend: Users can revoke tokens
+-   ✅ Backend: Token hash is stored securely (never plain text)
+-   ✅ Backend: Plain token shown only once during creation
+-   ⏳ Frontend: Users can generate tokens via UI
+-   ⏳ Frontend: Users can view and manage tokens in bot settings
 
 ---
 
