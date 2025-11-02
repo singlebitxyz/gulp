@@ -282,10 +282,145 @@
                     },
                     "response": []
                 }
-            ],
-            "description": "Widget token management endpoints for generating and managing tokens for embedding bots on websites"
-        }
-    ],
+			],
+			"description": "Widget token management endpoints for generating and managing tokens for embedding bots on websites"
+		},
+		{
+			"name": "Source Management",
+			"item": [
+				{
+					"name": "Upload File Source",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.environment.set('source_id', jsonData.data.id);",
+									"        console.log('Source ID saved:', jsonData.data.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Select a PDF, DOCX, or TXT file to upload (max 50MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}/sources/upload",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bots", "{{bot_id}}", "sources", "upload"]
+						},
+						"description": "Upload a file source (PDF, DOCX, or TXT) for a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Request Body:**\n- `file` (required): PDF, DOCX, or TXT file (max 50MB)\n\n**Supported File Types:**\n- PDF: `.pdf`, `application/pdf`\n- DOCX: `.docx`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`\n- TXT: `.txt`, `text/plain`\n\n**Response:**\n- Returns created source with ID and status\n- File is uploaded to Supabase Storage\n- Source status starts as 'uploaded'\n- Automatically saves source_id to environment variable"
+					},
+					"response": []
+				},
+				{
+					"name": "Add URL Source",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.environment.set('source_id', jsonData.data.id);",
+									"        console.log('Source ID saved:', jsonData.data.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"source_type\": \"html\",\n    \"original_url\": \"https://example.com/page\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}/sources/url",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bots", "{{bot_id}}", "sources", "url"]
+						},
+						"description": "Submit a URL as a source for a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Request Body:**\n- `source_type` (required): Must be \"html\"\n- `original_url` (required): Valid HTTP/HTTPS URL\n\n**Response:**\n- Returns created source with canonical URL\n- Source status starts as 'uploaded'\n- URL will be crawled and indexed in future phases\n- Automatically saves source_id to environment variable"
+					},
+					"response": []
+				},
+				{
+					"name": "List Sources",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}/sources",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bots", "{{bot_id}}", "sources"]
+						},
+						"description": "List all sources for a bot.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n\n**Response:**\n- Returns list of sources (files and URLs)\n- Includes status, file size, timestamps\n- Ordered by creation date (newest first)\n- Shows error messages for failed sources"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Source by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}/sources/{{source_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bots", "{{bot_id}}", "sources", "{{source_id}}"]
+						},
+						"description": "Get a specific source by ID.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n- `source_id`: Source UUID\n\n**Response:**\n- Returns source details if found and authorized\n- Returns 404 if source not found\n- Returns 403 if user doesn't own the bot"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Source",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/bots/{{bot_id}}/sources/{{source_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "bots", "{{bot_id}}", "sources", "{{source_id}}"]
+						},
+						"description": "Delete a source.\n\n**Authentication:** Required\n**Authorization:** Bot must belong to authenticated user\n**Path Parameters:**\n- `bot_id`: Bot UUID\n- `source_id`: Source UUID\n\n**Warning:** This action cannot be undone. All associated data including chunks, embeddings, and the file in storage will be deleted.\n\n**Response:**\n- Returns success message\n- Returns 404 if source not found\n- Returns 403 if user doesn't own the bot"
+					},
+					"response": []
+				}
+			],
+			"description": "Source management endpoints for uploading files and submitting URLs to train bots"
+		}
+	],
     "event": [
         {
             "listen": "prerequest",

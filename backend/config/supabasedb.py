@@ -27,10 +27,10 @@ class DatabaseManager:
         if self._client is None:
             try:
                 url: str = os.environ.get("SUPABASE_URL")
-                key: str = os.environ.get("SUPABASE_ANON_KEY")
+                key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
                 
                 if not url or not key:
-                    raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY must be set in environment variables")
+                    raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment variables")
                 
                 self._client = create_client(url, key)
                 logger.info("Supabase client initialized successfully")

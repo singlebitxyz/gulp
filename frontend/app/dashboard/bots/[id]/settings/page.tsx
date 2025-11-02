@@ -12,6 +12,7 @@ import BotTestChat from "@/components/dashboard/bots/bot-test-chat";
 import BotSettingsForm from "@/components/dashboard/bots/bot-settings-form";
 import BotTrainMode from "@/components/dashboard/bots/bot-train-mode";
 import BotWidgetManagement from "@/components/dashboard/bots/bot-widget-management";
+import BotSourcesManagement from "@/components/dashboard/bots/bot-sources-management";
 
 export default function BotSettingsPage() {
   const params = useParams();
@@ -74,8 +75,9 @@ export default function BotSettingsPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-lg grid-cols-4">
+        <TabsList className="grid w-full max-w-2xl grid-cols-5">
           <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="sources">Sources</TabsTrigger>
           <TabsTrigger value="widget">Widget</TabsTrigger>
           <TabsTrigger value="test">Test</TabsTrigger>
           <TabsTrigger value="train">Train</TabsTrigger>
@@ -83,6 +85,10 @@ export default function BotSettingsPage() {
 
         <TabsContent value="settings" className="space-y-6">
           <BotSettingsForm bot={bot} />
+        </TabsContent>
+
+        <TabsContent value="sources" className="space-y-6">
+          <BotSourcesManagement botId={bot.id} />
         </TabsContent>
 
         <TabsContent value="widget" className="space-y-6">

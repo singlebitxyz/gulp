@@ -111,6 +111,31 @@ psql "postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgre
 2. **`top_queries`** - Most frequently asked questions
 3. **`unanswered_queries`** - Queries with low confidence or no sources
 
+### Storage Buckets Setup
+
+Run `setup-storage-buckets.sql` to create the necessary storage buckets:
+
+```bash
+# Via Supabase Dashboard SQL Editor or CLI
+psql -h <your-supabase-db-host> -U postgres -d postgres -f scripts/setup-storage-buckets.sql
+```
+
+**Creates:**
+- `sources` bucket for file uploads (PDF, DOCX, TXT)
+- Storage policies for RLS (users can only access their own bot sources)
+- 50MB file size limit
+- MIME type restrictions
+
+**Storage Structure:**
+```
+sources/
+  └── bots/
+      └── {bot_id}/
+          └── sources/
+              └── {source_id}/
+                  └── {filename}
+```
+
 ## Important Notes
 
 ### Vector Embedding Dimension
