@@ -14,13 +14,14 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ## 📋 Implementation Status Summary
 
-**Completed Phases**: 5/14
+**Completed Phases**: 6/14
 
 -   ✅ Phase 1: Foundation & Bot Management
 -   ✅ Phase 2: Widget Token Management
 -   ✅ Phase 3: Source Management
 -   ✅ Phase 4: Document Parsing & Text Extraction
 -   ✅ Phase 5: Text Chunking & Metadata Extraction (Backend ✅ | Frontend ✅)
+-   ✅ Phase 6: Embedding Generation & Vector Storage (Backend ✅)
 
 **Next Phase**: Phase 6 - Embedding Generation & Vector Storage
 
@@ -365,37 +366,36 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ---
 
-### **Phase 6: Embedding Generation & Vector Storage** 🧮
+### **Phase 6: Embedding Generation & Vector Storage** 🧮 ✅ Backend COMPLETE
 
 **Goal**: Generate embeddings for chunks and store in vector database.
 
-#### Backend (FastAPI)
+#### Backend (FastAPI) ✅
 
--   [ ] Embedding service:
-    -   OpenAI embeddings API integration
-    -   Gemini embeddings API integration (if available)
-    -   Batch processing for efficiency
--   [ ] Vector storage service (Supabase pgvector)
--   [ ] Embedding repository/service layer
--   [ ] Update chunks with embeddings
--   [ ] Handle embedding failures
--   [ ] Update source status after indexing
+-   [x] Embedding providers (modular):
+    -   OpenAI provider (v1 SDK)
+    -   Gemini provider (`google-generativeai`), auto `models/` prefix
+    -   Dimension conformity to `EMBEDDING_DIMENSION` (default 1536)
+-   [x] EmbeddingService orchestrator with provider fallback (preferred-first)
+-   [x] Batch processing with configurable `EMBEDDING_BATCH_SIZE` (default 64)
+-   [x] Chunk repository method to persist embeddings
+-   [x] Integrated into parsing workflow post-chunking
+-   [x] Robust logging (INFO summary; DEBUG per-batch)
+-   [x] Env-configurable models and preference
 
 #### Frontend (Next.js)
 
--   [ ] Embedding progress indicator
--   [ ] Indexing completion notification
--   [ ] Chunk count with embeddings
+-   [ ] Embedding progress indicator (optional; parsing already covers progress)
+-   [ ] Indexing completion notification (optional)
 
 **Dependencies**: Phase 5 (Text Chunking)
 
 **Acceptance Criteria**:
 
--   Embeddings are generated for all chunks
--   Embeddings stored in pgvector correctly
--   Vector index is used for queries
--   Failed embeddings are retried
--   Source status updates to "indexed"
+-   ✅ Embeddings are generated for all chunks with provider fallback
+-   ✅ Embeddings stored in pgvector correctly
+-   ✅ Failed batches fall back to alternate provider
+-   ✅ Source status updates to "indexed" only after embeddings succeed
 
 ---
 

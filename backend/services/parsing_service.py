@@ -185,12 +185,35 @@ class ParsingService:
                     )
                     return False
                 
-                # Update status to indexed (parsing and chunking complete)
+                # Phase 6: Generate embeddings for created chunks
+                try:
+                    from services.embedding_service import EmbeddingService
+                    chunk_texts = [c.get("excerpt", "") for c in created_chunks]
+                    chunk_ids = [c.get("id") for c in created_chunks]
+                    embedding_service = EmbeddingService(access_token=self.access_token)
+                    updated = embedding_service.embed_chunks_for_source(
+                        source_id=source_id,
+                        texts=chunk_texts,
+                        chunk_ids=chunk_ids,
+                    )
+                    logger.info(
+                        f"Updated embeddings for {updated}/{len(created_chunks)} chunks of source {source_id}"
+                    )
+                except Exception as e:
+                    logger.error(f"Embedding failed for source {source_id}: {str(e)}", exc_info=True)
+                    self.source_repo.update_source_status(
+                        source_id=source_id,
+                        status=SourceStatus.FAILED.value,
+                        error_message=f"Embedding failed: {str(e)}"
+                    )
+                    return False
+
+                # Update status to indexed (chunking + embeddings complete)
                 self.source_repo.update_source_status(
                     source_id=source_id,
                     status=SourceStatus.INDEXED.value
                 )
-                
+
                 return True
             
             # Handle URL sources (HTML) - will be implemented in Phase 5

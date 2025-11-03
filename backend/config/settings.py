@@ -31,6 +31,17 @@ class Settings(BaseSettings):
     
     # CORS Settings
     cors_origins: list = Field(default=["http://localhost:3000"], env="CORS_ORIGINS")
+
+    # Embeddings
+    embedding_preferred: str = Field(default="openai", env="EMBEDDING_PREFERRED")
+    embedding_dimension: int = Field(default=1536, env="EMBEDDING_DIMENSION")
+    openai_embedding_model: str = Field(default="text-embedding-3-small", env="OPENAI_EMBEDDING_MODEL")
+    gemini_embedding_model: str = Field(default="text-embedding-004", env="GEMINI_EMBEDDING_MODEL")
+    # Optional API keys (providers read directly from env too)
+    google_api_key: Optional[str] = Field(default=None, env="GOOGLE_API_KEY")
+    gemini_api_key: Optional[str] = Field(default=None, env="GEMINI_API_KEY")
+    # Embedding batching
+    embedding_batch_size: int = Field(default=64, env="EMBEDDING_BATCH_SIZE")
     
     class Config:
         env_file = ".env"

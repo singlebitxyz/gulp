@@ -202,3 +202,37 @@ class ChunkRepository:
             logger.error(f"Error counting chunks for source {source_id}: {str(e)}")
             raise DatabaseError(f"Failed to count chunks: {str(e)}")
 
+    def update_chunk_embeddings(self, chunk_ids: List[UUID], embeddings: List[List[float]]) -> int:
+        """
+        Update embeddings for a batch of chunks.
+
+        Args:
+            chunk_ids: IDs of chunks to update
+            embeddings: Corresponding embedding vectors
+
+        Returns:
+            Number of updated rows
+
+        Raises:
+            DatabaseError: If database operation fails
+        """
+        if not chunk_ids or not embeddings or len(chunk_ids) != len(embeddings):
+            return 0
+
+        try:
+            # Supabase does not support bulk update by different values easily; do per-row
+            updated_count = 0
+            for cid, vec in zip(chunk_ids, embeddings):
+                response = (
+                    self.client.table("chunks")
+                    .update({"embedding": vec})
+                    .eq("id", str(cid))
+                    .execute()
+                )
+                if response.data:
+                    updated_count += 1
+            return updated_count
+        except Exception as e:
+            logger.error(f"Error updating chunk embeddings: {str(e)}")
+            raise DatabaseError(f"Failed to update embeddings: {str(e)}")
+
