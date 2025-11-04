@@ -7,13 +7,27 @@ type QueryRequest = {
   min_score?: number;
   session_id?: string;
   page_url?: string;
+  include_metadata?: boolean;
 };
 
 type QueryResponse = {
   status: string;
   data: {
     answer: string;
-    citations: { chunk_id: string; heading?: string; score?: number }[];
+    citations: {
+      chunk_id: string;
+      heading?: string;
+      score?: number;
+      source?: {
+        source_id: string;
+        source_type: string;
+        original_url?: string;
+        canonical_url?: string;
+        storage_path?: string;
+        filename?: string;
+      };
+    }[];
+    confidence?: number;
     context_preview?: string;
     session_id?: string;
     page_url?: string;

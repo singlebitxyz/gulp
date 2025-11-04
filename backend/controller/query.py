@@ -26,6 +26,7 @@ class QueryRequest(BaseModel):
     min_score: Optional[float] = Field(default=0.25, ge=0.0, le=1.0)
     session_id: Optional[str] = Field(default=None, description="Client session identifier")
     page_url: Optional[str] = Field(default=None, description="Origin URL of query")
+    include_metadata: Optional[bool] = Field(default=False, description="Include confidence and detailed source info (for testing/debugging)")
 
 
 @query_router.post("/bots/{bot_id}/query")
@@ -56,6 +57,7 @@ async def query_bot(request: Request, bot_id: UUID, body: QueryRequest):
             body.min_score or 0.25,
             body.session_id,
             body.page_url,
+            body.include_metadata or False,
         )
         # Attach echo of session/page for clients
         return {"status": "success", "data": {**result, "session_id": body.session_id, "page_url": body.page_url}}

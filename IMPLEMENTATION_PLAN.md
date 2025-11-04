@@ -14,7 +14,7 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ## 📋 Implementation Status Summary
 
-**Completed Phases**: 6/14
+**Completed Phases**: 7/14
 
 -   ✅ Phase 1: Foundation & Bot Management
 -   ✅ Phase 2: Widget Token Management
@@ -22,8 +22,9 @@ We'll implement one feature group at a time, building backend APIs first, then t
 -   ✅ Phase 4: Document Parsing & Text Extraction
 -   ✅ Phase 5: Text Chunking & Metadata Extraction (Backend ✅ | Frontend ✅)
 -   ✅ Phase 6: Embedding Generation & Vector Storage (Backend ✅)
+-   ✅ Phase 8: RAG Query Engine (Backend ✅ | Frontend ✅)
 
-**Next Phase**: Phase 8 - RAG Query Engine
+**Next Phase**: Phase 9 - Chat Widget (Embeddable)
 
 ---
 
@@ -436,9 +437,11 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ---
 
-### **Phase 8: RAG Query Engine** 🤖 — Backend ✅ | Frontend (partial)
+### **Phase 8: RAG Query Engine** 🤖 ✅ **COMPLETE**
 
 **Goal**: Answer user queries using RAG (vector search + LLM).
+
+**Status**: ✅ **COMPLETE** (Backend ✅ | Frontend ✅)
 
 #### Backend (FastAPI) ✅
 
@@ -451,30 +454,55 @@ We'll implement one feature group at a time, building backend APIs first, then t
     -   System prompt + history + retrieved chunks
     -   Token counting
     -   Context window management
--   [x] Query repository/service layer (logs with token usage, latency, sources)
+-   [x] Query repository/service layer (logs with token usage, latency, sources, confidence)
 -   [x] Query endpoint:
     -   `POST /api/v1/bots/:id/query` - Main query endpoint
+    -   `include_metadata` flag for performance optimization (testing vs production)
 -   [x] Response formatting with citations
--   [ ] Confidence scoring
+-   [x] Confidence scoring (average similarity scores)
+-   [x] Source metadata enrichment (source_id, source_type, URLs, filenames)
 -   [x] Query logging to database
 
-#### Frontend (Next.js)
+#### Frontend (Next.js) ✅
 
 -   [x] Query types/interfaces
 -   [x] React Query hooks for queries
 -   [x] Query testing interface (sandbox in bot settings)
--   [x] Response display with citations and Markdown rendering
--   [ ] Confidence indicator
+-   [x] Response display with Markdown rendering
+-   [x] Citations display with collapsible source info
+-   [x] Confidence indicator (color-coded badges)
+-   [x] Collapsible sources section (default closed)
+-   [x] Source metadata display (file names, URLs, types, headings)
 
 **Dependencies**: Phase 6 (Embeddings), Phase 1 (Bots)
 
+**Backend Completion Notes** (✅ Done):
+
+-   RAG pipeline: query embedding → vector search → context retrieval → LLM generation
+-   Confidence calculation: average similarity scores from retrieved chunks (0-1 scale)
+-   Source metadata fetching: batch lookup of source info (type, URLs, filenames) for citations
+-   Performance optimization: `include_metadata` flag separates testing (full metadata) from production (lightweight)
+-   Query logging: All queries logged with token usage, latency, confidence, and returned sources
+-   Both OpenAI and Gemini providers supported with fallback mechanism
+
+**Frontend Completion Notes** (✅ Done):
+
+-   Test chat interface in bot settings with real-time query testing
+-   Markdown rendering for LLM responses with proper styling
+-   Citations section with collapsible header (default closed) showing count and confidence
+-   Individual citation items expandable with source details (URLs, filenames, types, headings)
+-   Confidence displayed as color-coded badge (green ≥70%, yellow ≥50%, gray <50%)
+-   Clean, minimal UI for production use; full metadata only in test interface
+
 **Acceptance Criteria**:
 
--   Queries return relevant answers
--   Citations are included in responses
--   ⏳ Confidence scores are calculated (pending)
--   Queries are logged for analytics (with token usage)
--   Both OpenAI and Gemini work
+-   ✅ Queries return relevant answers
+-   ✅ Citations are included in responses with source metadata
+-   ✅ Confidence scores are calculated and displayed
+-   ✅ Queries are logged for analytics (with token usage, latency, confidence)
+-   ✅ Both OpenAI and Gemini work
+-   ✅ Production queries are lightweight (no metadata overhead)
+-   ✅ Test interface shows full metadata for debugging
 
 ---
 
