@@ -12,6 +12,7 @@ from repositories.bot_repo import BotRepository
 from services.bot_service import BotService
 from middleware.auth_guard import auth_guard
 from core.exceptions import BaseAPIException, NotFoundError, ValidationError, AuthorizationError
+from starlette.concurrency import run_in_threadpool
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ async def create_bot(request: Request, bot: BotCreateModel):
         # Get access token for RLS
         access_token = get_access_token_from_request(request)
         
-        result = bot_service.create_bot(bot, user_id, access_token=access_token)
+        result = await run_in_threadpool(bot_service.create_bot, bot, user_id, access_token)
         
         return {
             "status": "success",
@@ -128,7 +129,7 @@ async def list_bots(request: Request):
         # Get access token for RLS
         access_token = get_access_token_from_request(request)
         
-        bots = bot_service.get_user_bots(user_id, access_token=access_token)
+        bots = await run_in_threadpool(bot_service.get_user_bots, user_id, access_token)
         
         return {
             "status": "success",
@@ -164,7 +165,7 @@ async def get_bot(request: Request, bot_id: str):
         # Get access token for RLS
         access_token = get_access_token_from_request(request)
         
-        bot = bot_service.get_bot(bot_id, user_id, access_token=access_token)
+        bot = await run_in_threadpool(bot_service.get_bot, bot_id, user_id, access_token)
         
         return {
             "status": "success",
@@ -211,7 +212,7 @@ async def update_bot(request: Request, bot_id: str, bot: BotUpdateModel):
         # Get access token for RLS
         access_token = get_access_token_from_request(request)
         
-        result = bot_service.update_bot(bot_id, bot, user_id, access_token=access_token)
+        result = await run_in_threadpool(bot_service.update_bot, bot_id, bot, user_id, access_token)
         
         return {
             "status": "success",
@@ -263,7 +264,7 @@ async def delete_bot(request: Request, bot_id: str):
         # Get access token for RLS
         access_token = get_access_token_from_request(request)
         
-        bot_service.delete_bot(bot_id, user_id, access_token=access_token)
+        await run_in_threadpool(bot_service.delete_bot, bot_id, user_id, access_token)
         
         return {
             "status": "success",

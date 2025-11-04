@@ -436,34 +436,34 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ---
 
-### **Phase 8: RAG Query Engine** 🤖
+### **Phase 8: RAG Query Engine** 🤖 — Backend ✅ | Frontend (partial)
 
 **Goal**: Answer user queries using RAG (vector search + LLM).
 
-#### Backend (FastAPI)
+#### Backend (FastAPI) ✅
 
--   [ ] Query embedding service
--   [ ] Vector similarity search service (pgvector)
--   [ ] LLM adapters:
-    -   OpenAI adapter (GPT-4, GPT-4o)
-    -   Gemini adapter (Gemini-1.5)
--   [ ] Prompt composition service:
+-   [x] Query embedding service
+-   [x] Vector similarity search service (pgvector RPC)
+-   [x] LLM adapters:
+    -   OpenAI adapter (v1 SDK)
+    -   Gemini adapter (Generative AI, usage tracking)
+-   [x] Prompt composition service:
     -   System prompt + history + retrieved chunks
     -   Token counting
     -   Context window management
--   [ ] Query repository/service layer
--   [ ] Query endpoint:
+-   [x] Query repository/service layer (logs with token usage, latency, sources)
+-   [x] Query endpoint:
     -   `POST /api/v1/bots/:id/query` - Main query endpoint
--   [ ] Response formatting with citations
+-   [x] Response formatting with citations
 -   [ ] Confidence scoring
--   [ ] Query logging to database
+-   [x] Query logging to database
 
 #### Frontend (Next.js)
 
--   [ ] Query types/interfaces
--   [ ] React Query hooks for queries
--   [ ] Query testing interface (sandbox)
--   [ ] Response display with citations
+-   [x] Query types/interfaces
+-   [x] React Query hooks for queries
+-   [x] Query testing interface (sandbox in bot settings)
+-   [x] Response display with citations and Markdown rendering
 -   [ ] Confidence indicator
 
 **Dependencies**: Phase 6 (Embeddings), Phase 1 (Bots)
@@ -472,8 +472,8 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 -   Queries return relevant answers
 -   Citations are included in responses
--   Confidence scores are calculated
--   Queries are logged for analytics
+-   ⏳ Confidence scores are calculated (pending)
+-   Queries are logged for analytics (with token usage)
 -   Both OpenAI and Gemini work
 
 ---
@@ -691,6 +691,35 @@ We'll implement one feature group at a time, building backend APIs first, then t
 -   [ ] Query caching
 -   [ ] Embedding batch optimization
 -   [ ] Database query optimization
+
+---
+
+### **Operational Hardening (Post-MVP)** 🛡️
+
+**Goal**: Ensure the platform remains responsive and resilient under concurrent load and external provider variance.
+
+#### Backend (FastAPI)
+
+-   [ ] Server-sent events (SSE) streaming for chat answers in the query endpoint
+-   [ ] Global timeouts and exponential backoff with jitter for Supabase/HTTP/LLM calls
+-   [ ] Short-TTL caching for hot reads (user bots, bot metadata, sources)
+-   [ ] Circuit breakers for external providers to fail fast under outages
+-   [ ] Evaluate/introduce async clients where feasible to reduce thread usage
+-   [ ] Rate limits and quotas per user/org for queries and APIs
+
+#### Deployment/Operations
+
+-   [ ] Multi-worker deployment guidance (uvicorn/gunicorn workers per CPU)
+-   [ ] Threadpool and DB/HTTP connection pool tuning for expected concurrency
+-   [ ] Monitoring dashboards and alerts (latency, error rate, provider failures)
+
+**Acceptance Criteria**:
+
+-   Streaming responses reduce perceived latency for long answers
+-   No single slow external call blocks other requests (under typical load)
+-   Hot read endpoints serve quickly due to caching (30–120s TTL)
+-   Rate limits protect against noisy neighbors
+-   Dashboards show key SLOs and trigger alerts on regressions
 
 ---
 

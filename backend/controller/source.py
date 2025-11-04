@@ -19,6 +19,7 @@ from models.source_model import (
     SourceType,
 )
 from services.source_service import SourceService
+from starlette.concurrency import run_in_threadpool
 from services.parsing_service import ParsingService
 from middleware.auth_guard import auth_guard
 from core.exceptions import (
@@ -179,7 +180,7 @@ async def upload_file_source(
         # We'll verify ownership by trying to get the bot
         from services.bot_service import BotService
         bot_service = BotService()
-        bot_service.get_bot(str(bot_id), str(user_id), access_token=access_token)
+        await run_in_threadpool(bot_service.get_bot, str(bot_id), str(user_id), access_token)
         
         # Generate storage path: bots/{bot_id}/sources/{source_id}/{filename}
         # We'll create a temporary source ID first, then upload
@@ -193,10 +194,11 @@ async def upload_file_source(
         try:
             storage_client = get_supabase_client(use_service_role=True)
             
-            storage_response = storage_client.storage.from_("sources").upload(
+            storage_response = await run_in_threadpool(
+                storage_client.storage.from_("sources").upload,
                 storage_path,
                 file_content,
-                file_options={"content-type": mime_type}
+                {"content-type": mime_type}
             )
             
             if not storage_response:
@@ -212,13 +214,14 @@ async def upload_file_source(
             )
         
         # Create source record (source_service already initialized above)
-        source_data = source_service.create_file_source(
-            bot_id=bot_id,
-            user_id=UUID(user_id),
-            source_type=source_type,
-            storage_path=storage_path,
-            file_size=file_size,
-            mime_type=mime_type,
+        source_data = await run_in_threadpool(
+            source_service.create_file_source,
+            bot_id,
+            UUID(user_id),
+            source_type,
+            storage_path,
+            file_size,
+            mime_type,
         )
         
         source_id = UUID(source_data["id"])
@@ -300,10 +303,11 @@ async def create_url_source(
         
         source_service = SourceService(access_token=access_token)
         
-        source_result = source_service.create_url_source(
-            bot_id=bot_id,
-            user_id=UUID(user_id),
-            url=source_data.original_url,
+        source_result = await run_in_threadpool(
+            source_service.create_url_source,
+            bot_id,
+            UUID(user_id),
+            source_data.original_url,
         )
         
         # Trigger parsing in background (non-blocking) for URL crawl + chunk + embed
@@ -369,9 +373,10 @@ async def list_sources(
         
         source_service = SourceService(access_token=access_token)
         
-        sources = source_service.get_sources_by_bot(
-            bot_id=bot_id,
-            user_id=UUID(user_id),
+        sources = await run_in_threadpool(
+            source_service.get_sources_by_bot,
+            bot_id,
+            UUID(user_id),
         )
         
         response_data = [SourceResponseModel(**source) for source in sources]
@@ -424,10 +429,11 @@ async def get_source(
         
         source_service = SourceService(access_token=access_token)
         
-        source = source_service.get_source(
-            source_id=source_id,
-            bot_id=bot_id,
-            user_id=UUID(user_id),
+        source = await run_in_threadpool(
+            source_service.get_source,
+            source_id,
+            bot_id,
+            UUID(user_id),
         )
         
         response_data = SourceResponseModel(**source)
@@ -486,10 +492,11 @@ async def delete_source(
         
         source_service = SourceService(access_token=access_token)
         
-        source_service.delete_source(
-            source_id=source_id,
-            bot_id=bot_id,
-            user_id=UUID(user_id),
+        await run_in_threadpool(
+            source_service.delete_source,
+            source_id,
+            bot_id,
+            UUID(user_id),
         )
         
         return {

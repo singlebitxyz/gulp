@@ -18,6 +18,7 @@ from models.chunk_model import (
 )
 from services.chunk_service import ChunkService
 from middleware.auth_guard import auth_guard
+from starlette.concurrency import run_in_threadpool
 from core.exceptions import (
     ValidationError,
     NotFoundError,
@@ -86,10 +87,11 @@ async def list_chunks(
         access_token = get_access_token_from_request(request)
         
         chunk_service = ChunkService(access_token=access_token)
-        chunks = chunk_service.get_chunks_by_source(
-            source_id=source_id,
-            bot_id=bot_id,
-            user_id=UUID(user_id)
+        chunks = await run_in_threadpool(
+            chunk_service.get_chunks_by_source,
+            source_id,
+            bot_id,
+            UUID(user_id)
         )
         
         chunk_models = [ChunkResponseModel(**chunk) for chunk in chunks]
@@ -151,10 +153,11 @@ async def list_bot_chunks(
         access_token = get_access_token_from_request(request)
         
         chunk_service = ChunkService(access_token=access_token)
-        chunks = chunk_service.get_chunks_by_bot(
-            bot_id=bot_id,
-            user_id=UUID(user_id),
-            limit=limit
+        chunks = await run_in_threadpool(
+            chunk_service.get_chunks_by_bot,
+            bot_id,
+            UUID(user_id),
+            limit
         )
         
         chunk_models = [ChunkResponseModel(**chunk) for chunk in chunks]
@@ -210,10 +213,11 @@ async def get_chunk(
         access_token = get_access_token_from_request(request)
         
         chunk_service = ChunkService(access_token=access_token)
-        chunk = chunk_service.get_chunk(
-            chunk_id=chunk_id,
-            bot_id=bot_id,
-            user_id=UUID(user_id)
+        chunk = await run_in_threadpool(
+            chunk_service.get_chunk,
+            chunk_id,
+            bot_id,
+            UUID(user_id)
         )
         
         chunk_model = ChunkResponseModel(**chunk)
