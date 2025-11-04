@@ -1,15 +1,24 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { Bot, User, Send } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bot as BotIcon, Send, User } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useQueryBot } from "@/lib/query/hooks";
 import type { Bot } from "@/lib/types/bot";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
   id: string;
@@ -27,6 +36,7 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const queryMutation = useQueryBot(bot.id);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -54,20 +64,35 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
       setInput("");
       setIsLoading(true);
 
-      // TODO: Replace with actual API call to bot query endpoint
-      // For now, simulate a response
-      setTimeout(() => {
+      try {
+        const res = await queryMutation.mutateAsync({
+          query_text: userMessage.content,
+          top_k: 5,
+          min_score: 0.25,
+          session_id: "dashboard-test",
+          page_url:
+            typeof window !== "undefined" ? window.location.href : undefined,
+        });
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: `This is a test response from "${bot.name}". The actual query endpoint will be implemented in Phase 8 (RAG Query Engine). For now, this is a placeholder response to test the chat interface.`,
+          content: res.answer,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, aiMessage]);
+      } catch (err) {
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: "Sorry, I couldn't process that query. Please try again.",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+      } finally {
         setIsLoading(false);
-      }, 1000);
+      }
     },
-    [input, isLoading, bot.name]
+    [input, isLoading, bot.id]
   );
 
   const handleKeyDown = useCallback(
@@ -86,7 +111,7 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
+              <BotIcon className="h-5 w-5" />
               Test Chat
             </CardTitle>
             <CardDescription>
@@ -102,11 +127,11 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
           <div className="space-y-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                <Bot className="h-12 w-12 text-muted-foreground mb-4" />
+                <BotIcon className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Start Testing</h3>
                 <p className="text-muted-foreground max-w-md">
-                  Send a message to test how your bot responds. This will use the
-                  current system prompt and LLM configuration.
+                  Send a message to test how your bot responds. This will use
+                  the current system prompt and LLM configuration.
                 </p>
               </div>
             ) : (
@@ -124,7 +149,9 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
                   >
                     <div
                       className={`flex items-start gap-3 max-w-[80%] ${
-                        message.role === "user" ? "flex-row-reverse" : "flex-row"
+                        message.role === "user"
+                          ? "flex-row-reverse"
+                          : "flex-row"
                       }`}
                     >
                       <Avatar className="h-8 w-8 flex-shrink-0">
@@ -138,7 +165,7 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
                           {message.role === "user" ? (
                             <User className="h-4 w-4" />
                           ) : (
-                            <Bot className="h-4 w-4" />
+                            <BotIcon className="h-4 w-4" />
                           )}
                         </AvatarFallback>
                       </Avatar>
@@ -149,9 +176,77 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
                             : "bg-muted"
                         }`}
                       >
-                        <p className="text-sm whitespace-pre-wrap break-words">
-                          {message.content}
-                        </p>
+                        {message.role === "assistant" ? (
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                a: ({ node, ...props }) => (
+                                  <a
+                                    {...props}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    className="underline"
+                                  />
+                                ),
+                                code: ({
+                                  inline,
+                                  className,
+                                  children,
+                                  ...props
+                                }) => (
+                                  <code
+                                    className={
+                                      "rounded bg-background/50 px-1 py-0.5 text-[0.85em] " +
+                                      (className || "")
+                                    }
+                                    {...props}
+                                  >
+                                    {children}
+                                  </code>
+                                ),
+                                pre: ({ children }) => (
+                                  <pre className="overflow-auto rounded bg-background/50 p-3 text-sm">
+                                    {children}
+                                  </pre>
+                                ),
+                                ul: ({ children }) => (
+                                  <ul className="list-disc pl-5 space-y-1">
+                                    {children}
+                                  </ul>
+                                ),
+                                ol: ({ children }) => (
+                                  <ol className="list-decimal pl-5 space-y-1">
+                                    {children}
+                                  </ol>
+                                ),
+                                h1: ({ children }) => (
+                                  <h1 className="text-lg font-semibold">
+                                    {children}
+                                  </h1>
+                                ),
+                                h2: ({ children }) => (
+                                  <h2 className="text-base font-semibold">
+                                    {children}
+                                  </h2>
+                                ),
+                                table: ({ children }) => (
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                      {children}
+                                    </table>
+                                  </div>
+                                ),
+                              }}
+                            >
+                              {message.content}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p className="text-sm whitespace-pre-wrap break-words">
+                            {message.content}
+                          </p>
+                        )}
                         <p className="text-xs opacity-70 mt-1">
                           {message.timestamp.toLocaleTimeString([], {
                             hour: "2-digit",
@@ -174,7 +269,7 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-muted">
-                      <Bot className="h-4 w-4" />
+                      <BotIcon className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="bg-muted rounded-lg px-4 py-2">
@@ -184,7 +279,9 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
                         <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-100"></div>
                         <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-200"></div>
                       </div>
-                      <span className="text-xs text-muted-foreground">Thinking...</span>
+                      <span className="text-xs text-muted-foreground">
+                        Thinking...
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -220,4 +317,3 @@ export default function BotTestChat({ bot }: BotTestChatProps) {
     </Card>
   );
 }
-

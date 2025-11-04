@@ -12,6 +12,7 @@ import logging
 
 from middleware.auth_guard import auth_guard
 from services.rag_service import RagService
+from starlette.concurrency import run_in_threadpool
 from core.exceptions import ValidationError, DatabaseError, AuthorizationError
 
 logger = logging.getLogger(__name__)
@@ -45,14 +46,16 @@ async def query_bot(request: Request, bot_id: UUID, body: QueryRequest):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User ID not found in token")
 
         rag = RagService(access_token=access_token)
-        result = rag.answer(
-            bot_id=bot_id,
-            user_id=str(user_id),
-            query_text=body.query_text,
-            top_k=body.top_k or 5,
-            min_score=body.min_score or 0.25,
-            session_id=body.session_id,
-            page_url=body.page_url,
+        # Offload blocking retrieval/LLM work to a thread to avoid blocking the event loop
+        result = await run_in_threadpool(
+            rag.answer,
+            bot_id,
+            str(user_id),
+            body.query_text,
+            body.top_k or 5,
+            body.min_score or 0.25,
+            body.session_id,
+            body.page_url,
         )
         # Attach echo of session/page for clients
         return {"status": "success", "data": {**result, "session_id": body.session_id, "page_url": body.page_url}}
