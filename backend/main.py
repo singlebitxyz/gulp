@@ -12,6 +12,7 @@ from config.settings import settings
 from core.exceptions import BaseAPIException
 from core.logging import setup_logging
 from middleware.rate_limit import rate_limit_middleware
+from middleware.widget_query_cors import WidgetQueryCORSMiddleware
 
 # Setup logging
 setup_logging()
@@ -25,7 +26,7 @@ app = FastAPI(
     debug=settings.debug
 )
 
-# Add CORS middleware
+# Add general CORS middleware for other endpoints
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -33,6 +34,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add CORS middleware for widget query endpoint (allows all origins)
+# This is added AFTER general CORS so it runs first and handles widget query endpoint
+app.add_middleware(WidgetQueryCORSMiddleware)
 
 # Add rate limiting middleware
 @app.middleware("http")

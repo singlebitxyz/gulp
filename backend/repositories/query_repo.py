@@ -53,4 +53,37 @@ class QueryRepository:
             logger.error(f"Error inserting query log: {str(e)}")
             raise DatabaseError(f"Failed to insert query log: {str(e)}")
 
+    def get_recent_messages(self, bot_id: UUID, session_id: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Get recent query/response pairs from a session for chat history context.
+        
+        Args:
+            bot_id: ID of the bot
+            session_id: Session identifier
+            limit: Number of recent message pairs to retrieve (default: 5)
+        
+        Returns:
+            List of query/response pairs with query_text and response_summary
+        """
+        try:
+            # Fetch last N queries for this bot and session
+            # Order by created_at descending to get most recent first
+            response = self.client.table("queries")\
+                .select("query_text, response_summary, created_at")\
+                .eq("bot_id", str(bot_id))\
+                .eq("session_id", session_id)\
+                .order("created_at", desc=True)\
+                .limit(limit)\
+                .execute()
+            
+            # Get the data (most recent first)
+            messages = response.data or []
+            
+            # Reverse to get chronological order (oldest first) for context building
+            messages = list(reversed(messages))
+            return messages
+        except Exception as e:
+            logger.warning(f"Failed to fetch chat history for session {session_id}: {e}")
+            return []
+
 

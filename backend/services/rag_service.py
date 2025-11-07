@@ -61,7 +61,7 @@ class RagService:
             logger.error(f"Retrieval failed: bot_id={bot_id}, error={str(e)}")
             raise DatabaseError(f"Retrieval failed: {str(e)}")
 
-    def answer(self, bot_id: UUID, user_id: Optional[str], query_text: str, top_k: int = 5, min_score: float = 0.25, session_id: Optional[str] = None, page_url: Optional[str] = None, include_metadata: bool = False) -> Dict[str, Any]:
+    def answer(self, bot_id: UUID, user_id: Optional[str], query_text: str, top_k: int = 5, min_score: float = 0.25, session_id: Optional[str] = None, page_url: Optional[str] = None, include_metadata: bool = False, chat_history: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
         # Retrieve context
         t0 = time.time()
         chunks = self.retrieve(bot_id, query_text, top_k=top_k, min_score=min_score)
@@ -159,12 +159,54 @@ class RagService:
         system_prompt = (bot or {}).get("system_prompt") if isinstance(bot, dict) else None
         system_prompt = system_prompt or "You are a helpful assistant. Use the provided context to answer. If unsure, say you don't know."
 
-        prompt = (
-            f"System prompt: {system_prompt}\n\n"
-            f"Context:\n{context}\n\n"
-            f"User question: {query_text}\n\n"
-            f"Answer concisely and cite sources by heading if helpful."
-        )
+        # Build chat history string from provided chat_history or fetch from DB
+        chat_history_str = ""
+        if chat_history:
+            # Use chat history provided by client (from localStorage)
+            history_parts = []
+            for pair in chat_history:
+                query = pair.get("query", "").strip()
+                response = pair.get("response", "").strip()
+                if query and response:
+                    history_parts.append(f"User: {query}\nAssistant: {response}")
+            
+            if history_parts:
+                chat_history_str = "\n\n".join(history_parts)
+                logger.debug(f"Using {len(history_parts)} previous messages from client chat history")
+        elif session_id:
+            # Fallback: fetch from database if chat_history not provided
+            try:
+                recent_messages = self.query_repo.get_recent_messages(bot_id, session_id, limit=5)
+                if recent_messages:
+                    history_parts = []
+                    for msg in recent_messages:
+                        query = msg.get("query_text", "")
+                        response = msg.get("response_summary", "")
+                        if query and response:
+                            history_parts.append(f"User: {query}\nAssistant: {response}")
+                    
+                    if history_parts:
+                        chat_history_str = "\n\n".join(history_parts)
+                        logger.debug(f"Retrieved {len(recent_messages)} previous messages from database for session {session_id}")
+            except Exception as e:
+                logger.warning(f"Failed to retrieve chat history from database: {e}")
+
+        # Build prompt with chat history if available
+        if chat_history_str:
+            prompt = (
+                f"System prompt: {system_prompt}\n\n"
+                f"Previous conversation:\n{chat_history_str}\n\n"
+                f"Context from knowledge base:\n{context}\n\n"
+                f"User question: {query_text}\n\n"
+                f"Answer concisely and cite sources by heading if helpful. Consider the conversation history when answering."
+            )
+        else:
+            prompt = (
+                f"System prompt: {system_prompt}\n\n"
+                f"Context:\n{context}\n\n"
+                f"User question: {query_text}\n\n"
+                f"Answer concisely and cite sources by heading if helpful."
+            )
 
         llm = LLMService()
         answer_text, usage, provider_used = llm.generate(prompt)
