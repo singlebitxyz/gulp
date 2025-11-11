@@ -6,3 +6,4 @@ export * from "./widget-tokens";
 export * from "./sources";
 export * from "./chunks";
 export * from "./query";
+export * from "./analytics";

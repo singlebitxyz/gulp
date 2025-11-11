@@ -39,5 +39,20 @@ export const queryKeys = {
     list: () => ["bots", "list"] as const,
     detail: (botId: string) => ["bots", "detail", botId] as const,
   },
+  analytics: {
+    all: ["analytics"] as const,
+    summary: (botId: string, days?: number) => ["analytics", "summary", botId, days] as const,
+    queries: (botId: string, limit?: number, days?: number) => ["analytics", "queries", botId, limit, days] as const,
+    unanswered: (botId: string, limit?: number, days?: number) => ["analytics", "unanswered", botId, limit, days] as const,
+    usage: (botId: string, days?: number) => ["analytics", "usage", botId, days] as const,
+    overview: (botId: string, days?: number, topLimit?: number, unansweredLimit?: number) => [
+      "analytics",
+      "overview",
+      botId,
+      days,
+      topLimit,
+      unansweredLimit,
+    ] as const,
+  },
   // Add more query keys as needed
 } as const;

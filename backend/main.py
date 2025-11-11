@@ -8,6 +8,7 @@ from controller.widget_token import widget_token_router
 from controller.source import source_router
 from controller.query import query_router
 from controller.chunk import chunk_router
+from controller.analytics import analytics_router
 from config.settings import settings
 from core.exceptions import BaseAPIException
 from core.logging import setup_logging
@@ -52,6 +53,7 @@ app.include_router(widget_token_router, prefix="/api/v1", tags=["widget-token"])
 app.include_router(source_router, prefix="/api/v1", tags=["source"])
 app.include_router(query_router, prefix="/api/v1", tags=["query"])
 app.include_router(chunk_router, prefix="/api/v1", tags=["chunk"])
+app.include_router(analytics_router, prefix="/api/v1", tags=["analytics"])
 
 
 @app.exception_handler(BaseAPIException)

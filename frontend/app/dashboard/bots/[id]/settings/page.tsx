@@ -1,18 +1,19 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Bot as BotIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useBot, useUpdateBot } from "@/lib/query/hooks/bots";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BotTestChat from "@/components/dashboard/bots/bot-test-chat";
+import BotAnalytics from "@/components/dashboard/bots/bot-analytics";
 import BotSettingsForm from "@/components/dashboard/bots/bot-settings-form";
+import BotSourcesManagement from "@/components/dashboard/bots/bot-sources-management";
+import BotTestChat from "@/components/dashboard/bots/bot-test-chat";
 import BotTrainMode from "@/components/dashboard/bots/bot-train-mode";
 import BotWidgetManagement from "@/components/dashboard/bots/bot-widget-management";
-import BotSourcesManagement from "@/components/dashboard/bots/bot-sources-management";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useBot, useUpdateBot } from "@/lib/query/hooks/bots";
 
 export default function BotSettingsPage() {
   const params = useParams();
@@ -39,9 +40,14 @@ export default function BotSettingsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              {error instanceof Error ? error.message : "The bot you're looking for doesn't exist"}
+              {error instanceof Error
+                ? error.message
+                : "The bot you're looking for doesn't exist"}
             </p>
-            <Button onClick={() => router.push("/dashboard/bots")} variant="outline">
+            <Button
+              onClick={() => router.push("/dashboard/bots")}
+              variant="outline"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Bots
             </Button>
@@ -68,14 +74,20 @@ export default function BotSettingsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{bot.name}</h1>
-            <p className="text-sm text-muted-foreground">Bot Settings & Configuration</p>
+            <p className="text-sm text-muted-foreground">
+              Bot Settings & Configuration
+            </p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-2xl grid-cols-5">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="sources">Sources</TabsTrigger>
           <TabsTrigger value="widget">Widget</TabsTrigger>
@@ -106,4 +118,3 @@ export default function BotSettingsPage() {
     </div>
   );
 }
-

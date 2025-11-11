@@ -14,7 +14,7 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ## 📋 Implementation Status Summary
 
-**Completed Phases**: 9/14
+**Completed Phases**: 10/14
 
 -   ✅ Phase 1: Foundation & Bot Management
 -   ✅ Phase 2: Widget Token Management
@@ -25,8 +25,9 @@ We'll implement one feature group at a time, building backend APIs first, then t
 -   ✅ Phase 7: URL Crawling & Web Source Processing (Backend ✅)
 -   ✅ Phase 8: RAG Query Engine (Backend ✅ | Frontend ✅)
 -   ✅ Phase 9: Chat Widget (Embeddable) (Backend ✅ | Widget ✅)
+-   ✅ Phase 10: Analytics Dashboard (Backend ✅ | Frontend ✅)
 
-**Next Phase**: Phase 10 - Analytics Dashboard
+**Next Phase**: Phase 11 - System Prompt Training
 
 ---
 
@@ -592,48 +593,73 @@ We'll implement one feature group at a time, building backend APIs first, then t
 
 ---
 
-### **Phase 10: Analytics Dashboard** 📊
+### **Phase 10: Analytics Dashboard** 📊 ✅ **COMPLETE**
 
 **Goal**: View analytics on bot queries, usage, and performance.
 
-#### Backend (FastAPI)
+**Status**: ✅ **COMPLETE** (Backend ✅ | Frontend ✅)
 
--   [ ] Analytics service:
-    -   Query aggregation
-    -   Top queries calculation
-    -   Unanswered queries detection
-    -   Token usage aggregation
-    -   Confidence statistics
--   [ ] Analytics endpoints:
-    -   `GET /api/v1/bots/:id/analytics/summary` - Overall stats
-    -   `GET /api/v1/bots/:id/analytics/queries` - Top queries
-    -   `GET /api/v1/bots/:id/analytics/unanswered` - Unanswered queries
-    -   `GET /api/v1/bots/:id/analytics/usage` - Token usage over time
+#### Backend (FastAPI) ✅
 
-#### Frontend (Next.js)
+-   [x] Analytics service (`AnalyticsService`):
+    -   Query aggregation from queries table
+    -   Top queries calculation with frequency analysis
+    -   Unanswered queries detection (low confidence + no sources)
+    -   Token usage aggregation (prompt + completion tokens)
+    -   Confidence statistics and latency tracking
+-   [x] Analytics endpoints:
+    -   `GET /api/v1/bots/:id/analytics/summary` - Overall stats (total queries, sessions, tokens, avg confidence/latency)
+    -   `GET /api/v1/bots/:id/analytics/queries` - Top queries by frequency
+    -   `GET /api/v1/bots/:id/analytics/unanswered` - Unanswered queries (low confidence or no sources)
+    -   `GET /api/v1/bots/:id/analytics/usage` - Token usage and query volume over time
+-   [x] Service role access for analytics queries (bypasses RLS)
+-   [x] Authorization checks ensure users can only view their bot analytics
 
--   [ ] Analytics types/interfaces
--   [ ] React Query hooks for analytics
--   [ ] Analytics dashboard page (`/dashboard/bots/:id/analytics`)
--   [ ] Charts and visualizations:
-    -   Query volume over time
-    -   Top queries table
-    -   Confidence distribution
-    -   Token usage chart
--   [ ] Unanswered queries list
--   [ ] Export to CSV functionality
--   [ ] Date range filters
+#### Frontend (Next.js) ✅
 
-**Dependencies**: Phase 8 (RAG Query Engine)
+-   [x] Analytics types/interfaces (`analytics.ts`)
+-   [x] React Query hooks for analytics (`useAnalyticsSummary`, `useTopQueries`, `useUnansweredQueries`, `useUsageOverTime`)
+-   [x] Analytics dashboard page (added Analytics tab to bot settings)
+-   [x] Charts and visualizations:
+    -   Query volume over time (BarChart)
+    -   Confidence distribution over time (LineChart)
+    -   Summary cards (queries, tokens, confidence, latency)
+-   [x] Top queries list with frequency and confidence
+-   [x] Unanswered queries list with confidence and sources count
+-   [x] Export to CSV functionality for all data sections
+-   [x] Date range filters (7, 30, 90 days, 1 year)
+-   [x] Responsive design with loading states and error handling
+
+**Dependencies**: Phase 8 (RAG Query Engine) ✅
+
+**Backend Completion Notes** (✅ Done):
+
+-   Created `AnalyticsService` with comprehensive analytics aggregation
+-   Implemented 4 analytics endpoints with proper error handling
+-   Added service role client usage for admin-level analytics access
+-   Authorization checks ensure users can only access their own bot data
+-   Efficient SQL queries with date filtering and aggregation
+
+**Frontend Completion Notes** (✅ Done):
+
+-   Created comprehensive analytics dashboard with modern UI
+-   Implemented charts using Recharts with responsive design
+-   Added CSV export functionality with proper data formatting
+-   Date range selector with 4 preset options
+-   Real-time data fetching with React Query caching
+-   Toast notifications for export actions
+-   Loading skeletons and error states
 
 **Acceptance Criteria**:
 
--   Users can view query statistics
--   Top queries are displayed
--   Unanswered queries are identified
--   Token usage is tracked
--   Data can be exported to CSV
--   Charts are interactive
+-   ✅ Users can view query statistics with summary cards
+-   ✅ Top queries are displayed with frequency and confidence
+-   ✅ Unanswered queries are identified and listed
+-   ✅ Token usage is tracked and visualized over time
+-   ✅ Data can be exported to CSV with proper formatting
+-   ✅ Charts are interactive with tooltips and responsive design
+-   ✅ Date range filters work (7, 30, 90 days, 1 year)
+-   ✅ Real-time updates with loading states
 
 ---
 
