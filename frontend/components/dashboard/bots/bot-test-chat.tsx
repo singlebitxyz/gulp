@@ -74,7 +74,7 @@ function CitationSection({
   return (
     <div className="mt-3 pt-3 border-t border-border/50">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="w-full flex items-center justify-between mb-2 hover:bg-accent/30 rounded px-2 py-1 transition-colors">
+        <CollapsibleTrigger className="w-full flex items-center justify-between mb-2 hover:bg-primary/20 hover:text-primary rounded px-2 py-1 transition-colors">
           <div className="flex items-center gap-2">
             <div className="text-xs font-medium text-muted-foreground">
               Sources ({citations.length})
@@ -126,7 +126,7 @@ function CitationItem({ citation, idx }: { citation: Citation; idx: number }) {
       open={isOpen}
       onOpenChange={setIsOpen}
     >
-      <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-accent/50 transition-colors">
+      <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-primary/20 hover:text-primary transition-colors">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {citation.source?.source_type === "html" ? (
             <LinkIcon className="h-3 w-3 flex-shrink-0 text-muted-foreground" />

@@ -4,8 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bot, Home, Settings } from "lucide-react";
-import { UserPopover } from "@/components/dashboard/layout/user-popover";
 import { RecentBots } from "@/components/dashboard/layout/sidebar/recent-bots";
+import { UserPopover } from "@/components/dashboard/layout/user-popover";
 import {
   Sidebar,
   SidebarContent,
@@ -22,11 +22,11 @@ import { useBots } from "@/lib/query/hooks/bots";
 
 // Navigation items
 const mainNavItems = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-  },
+  // {
+  //   title: "Dashboard",
+  //   url: "/dashboard",
+  //   icon: Home,
+  // },
   {
     title: "Bots",
     url: "/dashboard/bots",
@@ -80,8 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {mainNavItems.map((item) => {
               const isActive =
                 pathname === item.url ||
-                (item.url !== "/dashboard" &&
-                  pathname.startsWith(item.url));
+                (item.url !== "/dashboard" && pathname.startsWith(item.url));
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive}>

@@ -38,7 +38,7 @@ export default function Hero() {
           >
             {" "}
             <AnimatedShinyText
-              className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400"
+              className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-primary hover:duration-300"
               onClick={() =>
                 window.open("https://github.com/namanbarkiya", "_blank")
               }

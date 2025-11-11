@@ -17,7 +17,7 @@ interface BotAnalyticsProps {
   botId: string;
 }
 
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
+const COLORS = ['oklch(var(--chart-1))', 'oklch(var(--chart-2))', 'oklch(var(--chart-3))', 'oklch(var(--chart-4))', 'oklch(var(--chart-5))'];
 
 // CSV export utilities
 const convertToCSV = (data: any[], headers: string[]) => {
@@ -134,15 +134,15 @@ export default function BotAnalytics({ botId }: BotAnalyticsProps) {
   const chartConfig = {
     queries: {
       label: "Queries",
-      color: "oklch(0.646 0.222 41.116)",
+      color: "oklch(0.87 0.15 90)", // Primary yellow
     },
     tokens: {
       label: "Tokens",
-      color: "oklch(0.6 0.118 184.704)",
+      color: "oklch(0.75 0.18 60)", // Orange-yellow
     },
     confidence: {
       label: "Avg Confidence",
-      color: "oklch(0.646 0.222 41.116)",
+      color: "oklch(0.80 0.14 75)", // Amber/gold
     },
   } satisfies ChartConfig;
 

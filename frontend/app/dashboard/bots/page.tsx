@@ -60,8 +60,8 @@ function BotCard({
     <Card
       className={cn(
         "group relative overflow-hidden transition-all duration-300 cursor-pointer",
-        "border border-border hover:border-primary/50",
-        "hover:shadow-lg hover:shadow-primary/5",
+        "border border-border hover:border-primary",
+        "hover:shadow-lg hover:shadow-primary/10",
         "hover:-translate-y-1 bg-card"
       )}
       onClick={onView}

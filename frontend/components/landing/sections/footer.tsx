@@ -37,7 +37,7 @@ export default function Footer({ className }: { className?: string }) {
                 href="https://github.com/namanbarkiya/niya-saas-template"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                className="flex items-center gap-2 text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
               >
                 <Github className="w-4 h-4" />
                 <span>View on GitHub</span>
@@ -57,7 +57,7 @@ export default function Footer({ className }: { className?: string }) {
                   href="https://github.com/namanbarkiya/niya-saas-template"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                 >
                   Download Template
                 </a>
@@ -67,7 +67,7 @@ export default function Footer({ className }: { className?: string }) {
                   href="https://saas.nbarkiya.xyz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                 >
                   Live Demo
                 </a>
@@ -77,7 +77,7 @@ export default function Footer({ className }: { className?: string }) {
                   href="https://github.com/namanbarkiya/niya-saas-template/blob/main/project-details/technical-description.md"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                 >
                   Documentation
                 </a>
@@ -96,7 +96,7 @@ export default function Footer({ className }: { className?: string }) {
                   href="https://nextjs.org/docs"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                 >
                   Next.js Docs
                 </a>
@@ -106,7 +106,7 @@ export default function Footer({ className }: { className?: string }) {
                   href="https://supabase.com/docs"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                 >
                   Supabase Docs
                 </a>
@@ -116,7 +116,7 @@ export default function Footer({ className }: { className?: string }) {
                   href="https://tailwindcss.com/docs"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors"
                 >
                   Tailwind CSS
                 </a>
@@ -133,7 +133,7 @@ export default function Footer({ className }: { className?: string }) {
               href="https://github.com/namanbarkiya"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              className="hover:underline hover:text-primary dark:hover:text-primary transition-colors"
             >
               Naman Barkiya
             </a>

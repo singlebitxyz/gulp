@@ -82,13 +82,13 @@
     function getThemeColors(isDark) {
         if (isDark) {
             return {
-                background: 'oklch(0.147 0.004 49.25)', // --background (dark)
-                foreground: 'oklch(0.985 0.001 106.423)', // --foreground (dark)
-                card: 'oklch(0.216 0.006 56.043)', // --card (dark)
+                background: 'oklch(0.10 0.005 270)', // #16171B - black background
+                foreground: 'oklch(0.985 0.001 106.423)', // white text
+                card: 'oklch(0.15 0.005 270)', // slightly lighter black for cards
                 cardForeground: 'oklch(0.985 0.001 106.423)',
-                primary: 'oklch(0.923 0.003 48.717)', // --primary (dark)
-                primaryForeground: 'oklch(0.216 0.006 56.043)',
-                muted: 'oklch(0.268 0.007 34.298)', // --muted (dark)
+                primary: 'oklch(0.87 0.15 90)', // #F7CE45 - yellow
+                primaryForeground: 'oklch(0.10 0.005 270)', // #16171B - black on yellow
+                muted: 'oklch(0.20 0.005 270)', // --muted (dark)
                 mutedForeground: 'oklch(0.709 0.01 56.259)',
                 border: 'oklch(1 0 0 / 10%)', // --border (dark)
                 input: 'oklch(1 0 0 / 15%)',
@@ -96,12 +96,12 @@
             };
         } else {
             return {
-                background: 'oklch(1 0 0)', // --background (light)
-                foreground: 'oklch(0.147 0.004 49.25)', // --foreground (light)
-                card: 'oklch(1 0 0)', // --card (light)
-                cardForeground: 'oklch(0.147 0.004 49.25)',
-                primary: 'oklch(0.216 0.006 56.043)', // --primary (light)
-                primaryForeground: 'oklch(0.985 0.001 106.423)',
+                background: 'oklch(1 0 0)', // white background
+                foreground: 'oklch(0.10 0.005 270)', // #16171B - black text
+                card: 'oklch(1 0 0)', // white card
+                cardForeground: 'oklch(0.10 0.005 270)',
+                primary: 'oklch(0.87 0.15 90)', // #F7CE45 - yellow
+                primaryForeground: 'oklch(0.10 0.005 270)', // #16171B - black on yellow
                 muted: 'oklch(0.97 0.001 106.424)', // --muted (light)
                 mutedForeground: 'oklch(0.553 0.013 58.071)',
                 border: 'oklch(0.923 0.003 48.717)', // --border (light)
