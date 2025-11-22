@@ -17,6 +17,19 @@ export class APIError extends Error {
 }
 
 /**
+ * Get the base API URL
+ * Uses NEXT_PUBLIC_API_BASE_URL if set, otherwise uses relative path (for rewrites)
+ */
+function getApiBaseUrl(): string {
+  // If NEXT_PUBLIC_API_BASE_URL is set, use it directly (for external API)
+  if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+  // Otherwise use relative path (will use Next.js rewrite)
+  return "";
+}
+
+/**
  * Make an API request to the backend
  * Automatically includes cookies for authentication
  */
@@ -24,7 +37,10 @@ export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const baseUrl = getApiBaseUrl();
+  const url = endpoint.startsWith("/") 
+    ? `${baseUrl}${endpoint}` 
+    : `${baseUrl}/${endpoint}`;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
