@@ -47,7 +47,7 @@ export default function WidgetTokenCreateDialog({
 
   // Get API URL from environment or use default
   const apiUrl =
-    process.env.NEXT_PUBLIC_GULP_API_URL || "http://localhost:8000";
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
   // Get widget.js URL - can be from same origin or CDN
   const widgetJsUrl =
     process.env.NEXT_PUBLIC_GULP_WIDGET_URL ||
