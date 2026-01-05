@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     description:
       "Embed intelligent chatbots on your website powered by your own documents, PDFs, URLs, or custom text. Train your bot with custom knowledge bases, choose OpenAI or Gemini, and embed with one line of code.",
     creator: "@namanbarkiya",
-    images: [SEO_IMAGE_URL],
+    images: [OG_IMAGE_URL],
   },
   robots: {
     index: true,
