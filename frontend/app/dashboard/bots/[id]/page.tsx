@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Bot as BotIcon } from "lucide-react";
 import BotAnalytics from "@/components/dashboard/bots/bot-analytics";
@@ -21,6 +21,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBot } from "@/lib/query/hooks/bots";
+import { useBreadcrumbs } from "@/lib/hooks/use-breadcrumbs";
 
 export default function BotDetailPage() {
   const params = useParams();
@@ -28,6 +29,22 @@ export default function BotDetailPage() {
   const botId = params.id as string;
   const { data: bot, isLoading, error } = useBot(botId);
   const [activeTab, setActiveTab] = useState("settings");
+  const { setBreadcrumbs } = useBreadcrumbs();
+
+  // Update breadcrumbs when bot data is loaded
+  useEffect(() => {
+    if (bot) {
+      setBreadcrumbs([
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Bots", href: "/dashboard/bots" },
+        { label: bot.name, href: `/dashboard/bots/${bot.id}` },
+      ]);
+    }
+    // Cleanup: restore auto-generated breadcrumbs when component unmounts
+    return () => {
+      // The GlobalBreadcrumb component will regenerate breadcrumbs on pathname change
+    };
+  }, [bot, setBreadcrumbs]);
 
   if (isLoading) {
     return (
