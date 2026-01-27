@@ -16,6 +16,7 @@ from core.exceptions import BaseAPIException
 from core.logging import setup_logging
 from middleware.rate_limit import rate_limit_middleware
 from middleware.widget_query_cors import WidgetQueryCORSMiddleware
+from services.rate_limit_service import rate_limit_service
 
 # Setup logging
 setup_logging()
@@ -50,6 +51,17 @@ app.add_middleware(WidgetQueryCORSMiddleware)
 async def rate_limit(request: Request, call_next):
     """Rate limiting middleware"""
     return await rate_limit_middleware(request, call_next)
+
+
+# Cleanup old rate limit windows on startup
+@app.on_event("startup")
+async def startup_event():
+    """Cleanup old rate limit windows on startup"""
+    try:
+        deleted_count = rate_limit_service.cleanup_old_windows(older_than_hours=1)
+        logger.info(f"Cleaned up {deleted_count} old rate limit windows on startup")
+    except Exception as e:
+        logger.warning(f"Failed to cleanup old rate limit windows on startup: {str(e)}")
 
 # Include routers
 app.include_router(user_router, prefix="/api/v1", tags=["user"])

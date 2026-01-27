@@ -117,6 +117,10 @@ CREATE TABLE IF NOT EXISTS public.sources (
 -- Indexes for sources table
 CREATE INDEX IF NOT EXISTS idx_sources_bot_id ON public.sources(bot_id);
 CREATE INDEX IF NOT EXISTS idx_sources_status ON public.sources(status);
+-- Composite index for bot_id + status filtering (critical for performance)
+CREATE INDEX IF NOT EXISTS idx_sources_bot_status ON public.sources(bot_id, status);
+-- Partial index for indexed sources (most common filter)
+CREATE INDEX IF NOT EXISTS idx_sources_bot_indexed ON public.sources(bot_id) WHERE status = 'indexed';
 CREATE INDEX IF NOT EXISTS idx_sources_type ON public.sources(source_type);
 CREATE INDEX IF NOT EXISTS idx_sources_canonical_url ON public.sources(canonical_url) WHERE canonical_url IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_sources_page_checksum ON public.sources(page_checksum) WHERE page_checksum IS NOT NULL;
@@ -159,6 +163,8 @@ CREATE INDEX IF NOT EXISTS idx_chunks_bot_id ON public.chunks(bot_id);
 CREATE INDEX IF NOT EXISTS idx_chunks_source_id ON public.chunks(source_id);
 CREATE INDEX IF NOT EXISTS idx_chunks_bot_source ON public.chunks(bot_id, source_id);
 CREATE INDEX IF NOT EXISTS idx_chunks_chunk_index ON public.chunks(source_id, chunk_index);
+-- Partial index for bot_id with embeddings (optimizes vector search)
+CREATE INDEX IF NOT EXISTS idx_chunks_bot_embedding ON public.chunks(bot_id) WHERE embedding IS NOT NULL;
 
 -- Vector similarity search index (HNSW for fast approximate search)
 CREATE INDEX IF NOT EXISTS idx_chunks_embedding_hnsw ON public.chunks 
@@ -213,7 +219,11 @@ CREATE TABLE IF NOT EXISTS public.queries (
 
 -- Indexes for queries table
 CREATE INDEX IF NOT EXISTS idx_queries_bot_id ON public.queries(bot_id);
+-- Composite index for bot_id + created_at (optimal for date range queries and daily count checks)
 CREATE INDEX IF NOT EXISTS idx_queries_bot_created ON public.queries(bot_id, created_at DESC);
+-- Composite index for analytics queries (with confidence filtering)
+CREATE INDEX IF NOT EXISTS idx_queries_analytics ON public.queries(bot_id, created_at DESC, confidence)
+    WHERE confidence IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_queries_session_id ON public.queries(session_id);
 CREATE INDEX IF NOT EXISTS idx_queries_page_url ON public.queries(page_url) WHERE page_url IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_queries_created_at ON public.queries(created_at DESC);
