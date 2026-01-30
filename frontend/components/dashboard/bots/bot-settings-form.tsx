@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { Calendar, Save, UserPlus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useNotifications } from "@/lib/hooks/use-notifications";
 import { useUpdateBot } from "@/lib/query/hooks/bots";
@@ -45,6 +46,10 @@ export default function BotSettingsForm({ bot }: BotSettingsFormProps) {
     },
     retention_days: bot.retention_days,
   });
+
+  // Mock: Action tools (Calendar booking + Lead capture) — UI only for demo/video
+  const [enableCalendar, setEnableCalendar] = useState(false);
+  const [enableLeads, setEnableLeads] = useState(true);
 
   // Update form when bot data changes
   useEffect(() => {
@@ -276,6 +281,51 @@ export default function BotSettingsForm({ bot }: BotSettingsFormProps) {
                 How long to keep query logs (1-3650 days)
               </p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Action tools (mock for demo/video — CALENDAR_LEADS_INTEGRATION_PLAN) */}
+      <Card className="border-amber-500/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            Action tools
+            <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-xs font-normal text-amber-700 dark:text-amber-400">
+              Demo
+            </span>
+          </CardTitle>
+          <CardDescription>
+            Let your bot book meetings and capture leads from conversations.
+            Configure in Integrations and view leads in the Leads tab.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Enable calendar booking</p>
+                <p className="text-xs text-muted-foreground">
+                  Bot can check availability and book meetings
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={enableCalendar}
+              onCheckedChange={setEnableCalendar}
+            />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <UserPlus className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Enable lead capture</p>
+                <p className="text-xs text-muted-foreground">
+                  Bot can collect email, name, and store leads
+                </p>
+              </div>
+            </div>
+            <Switch checked={enableLeads} onCheckedChange={setEnableLeads} />
           </div>
         </CardContent>
       </Card>

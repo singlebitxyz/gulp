@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Bot as BotIcon } from "lucide-react";
 import BotAnalytics from "@/components/dashboard/bots/bot-analytics";
+import BotIntegrationsMock from "@/components/dashboard/bots/bot-integrations-mock";
+import BotLeadsMock from "@/components/dashboard/bots/bot-leads-mock";
+import BotSampleChat from "@/components/dashboard/bots/bot-sample-chat";
 import BotSettingsForm from "@/components/dashboard/bots/bot-settings-form";
 import BotSourcesManagement from "@/components/dashboard/bots/bot-sources-management";
 import BotTestChat from "@/components/dashboard/bots/bot-test-chat";
@@ -122,19 +125,25 @@ export default function BotDetailPage() {
               <SelectItem value="analytics">Analytics</SelectItem>
               <SelectItem value="sources">Sources</SelectItem>
               <SelectItem value="widget">Widget</SelectItem>
+              <SelectItem value="integrations">Integrations</SelectItem>
+              <SelectItem value="leads">Leads</SelectItem>
               <SelectItem value="test">Test</SelectItem>
+              <SelectItem value="sample">Sample Chat</SelectItem>
               <SelectItem value="train">Train</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Desktop Tabs */}
-        <TabsList className="hidden md:grid w-full grid-cols-6">
+        <TabsList className="hidden md:grid w-full grid-cols-9">
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="sources">Sources</TabsTrigger>
           <TabsTrigger value="widget">Widget</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
+          <TabsTrigger value="leads">Leads</TabsTrigger>
           <TabsTrigger value="test">Test</TabsTrigger>
+          <TabsTrigger value="sample">Sample Chat</TabsTrigger>
           <TabsTrigger value="train">Train</TabsTrigger>
         </TabsList>
 
@@ -154,8 +163,20 @@ export default function BotDetailPage() {
           <BotWidgetManagement botId={bot.id} />
         </TabsContent>
 
+        <TabsContent value="integrations" className="space-y-6">
+          <BotIntegrationsMock />
+        </TabsContent>
+
+        <TabsContent value="leads" className="space-y-6">
+          <BotLeadsMock />
+        </TabsContent>
+
         <TabsContent value="test" className="space-y-6">
           <BotTestChat bot={bot} />
+        </TabsContent>
+
+        <TabsContent value="sample" className="space-y-6">
+          <BotSampleChat bot={bot} />
         </TabsContent>
 
         <TabsContent value="train" className="space-y-6">
